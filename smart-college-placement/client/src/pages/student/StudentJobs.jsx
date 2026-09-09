@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   studentService, 
-  companyService 
 } from '../../services';
 import { 
   LoadingSpinner, 
@@ -56,17 +55,38 @@ export const StudentJobs = () => {
 
   const fetchInitialData = async () => {
     try {
-      const [jobsRes, profileRes, compRes, resumeRes, appsRes] = await Promise.all([
+      const [jobsRes, profileRes, resumeRes, appsRes] = await Promise.all([
         studentService.getRecommendedJobs(filters),
         studentService.getProfile().catch(() => ({ data: { studentProfile: null } })),
-        companyService.getVacancies().catch(() => ({ data: { companies: [] } })),
         studentService.getResume().catch(() => ({ data: { resume: null } })),
         studentService.getApplications().catch(() => ({ data: { applications: [] } })),
       ]);
 
-      setJobs(jobsRes.data.jobs || []);
+      const eligibleJobs = jobsRes.data.jobs || [];
+      const companyRoleSummary = eligibleJobs.reduce((summary, job) => {
+        const company = job.companyId && typeof job.companyId === 'object' ? job.companyId : {};
+        const companyId = company._id || job.companyId;
+        if (!companyId) return summary;
+
+        const current = summary[companyId] || {
+          ...company,
+          totalVacancies: 0,
+          roleTitles: [],
+        };
+        current.totalVacancies += job.vacancies || 1;
+        current.roleTitles.push(job.title);
+        summary[companyId] = current;
+        return summary;
+      }, {});
+
+      setJobs(eligibleJobs);
       setStudentProfile(profileRes.data.studentProfile);
-      setCompanies(compRes.data.companies || []);
+      setCompanies(
+        Object.values(companyRoleSummary).map((company) => ({
+          ...company,
+          jobsPosted: company.roleTitles.length,
+        }))
+      );
 
       if (resumeRes.data.hasResume && resumeRes.data.resume) {
         setResumeData(resumeRes.data.resume);
@@ -149,7 +169,7 @@ export const StudentJobs = () => {
               <div>
                 <p className="text-xs text-indigo-200 uppercase font-bold">Total Vacancies</p>
                 <p className="text-2xl sm:text-3xl font-black text-white">
-                  {companies.reduce((acc, c) => acc + (c.totalVacancies || 0), 0)}+
+                  {companies.reduce((acc, c) => acc + (c.totalVacancies || 0), 0)}
                 </p>
               </div>
               <div className="w-px h-10 bg-white/20" />
@@ -179,7 +199,7 @@ export const StudentJobs = () => {
           <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
             <div>
               <h2 className="text-xl font-bold text-gray-900">Partner Enterprise Vacancies</h2>
-              <p className="text-xs text-gray-500">Live dynamic vacancy counts retrieved directly from company drives.</p>
+              <p className="text-xs text-gray-500">Eligible roles and openings based on your registered student profile.</p>
             </div>
             <span className="text-xs font-semibold text-primary">Click any company to inspect hiring statistics</span>
           </div>
@@ -202,7 +222,7 @@ export const StudentJobs = () => {
                       )}
                     </div>
                     <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-indigo-50 text-primary border border-indigo-100 group-hover:bg-primary group-hover:text-white transition-colors">
-                      {comp.totalVacancies} Vacancies
+                      {comp.totalVacancies} {comp.totalVacancies === 1 ? 'Vacancy' : 'Vacancies'}
                     </span>
                   </div>
 
@@ -210,10 +230,13 @@ export const StudentJobs = () => {
                     {comp.companyName}
                   </h3>
                   <p className="text-xs text-gray-500 line-clamp-1">{comp.industry || 'IT & Software'}</p>
+                  <p className="text-xs text-gray-600 mt-2 line-clamp-2">
+                    {comp.roleTitles?.join(' · ')}
+                  </p>
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
-                  <span>{comp.hiringCount}+ Recruited</span>
+                  <span>{comp.jobsPosted} {comp.jobsPosted === 1 ? 'Role' : 'Roles'}</span>
                   <span className="inline-flex items-center text-primary font-bold gap-1 group-hover:translate-x-0.5 transition-transform">
                     Details <ChevronRight size={14} />
                   </span>
@@ -257,7 +280,7 @@ export const StudentJobs = () => {
                       : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-100'
                   }`}
                 >
-                  {c.companyName} ({c.totalVacancies})
+                  {c.companyName} ({c.jobsPosted})
                 </button>
               ))}
             </div>
