@@ -89,8 +89,16 @@ app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/ai', require('./routes/aiRoutes'));
 
 // Health Check
+app.get('/', (req, res) => {
+  res.status(200).json({ status: 'Smart College Placement API is running' });
+});
+
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'Server is running' });
+});
+
+app.get('/favicon.ico', (req, res) => {
+  res.sendStatus(204);
 });
 
 // 404 Handler
