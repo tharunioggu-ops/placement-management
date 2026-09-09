@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 200" fill="none">
+  <defs>
+    <linearGradient id="support-shield-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="headset-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="bubble-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+    <filter id="supp-shadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#10b981" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <!-- Ambient Light -->
+  <circle cx="140" cy="100" r="70" fill="#10b981" fill-opacity="0.1"/>
+  <circle cx="90" cy="70" r="45" fill="#4f46e5" fill-opacity="0.08"/>
+
+  <!-- Protective Trust Shield in Background -->
+  <path d="M 140 25 C 175 25 205 35 205 75 C 205 125 160 160 140 172 C 120 160 75 125 75 75 C 75 35 105 25 140 25 Z" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.5"/>
+
+  <!-- Support Concierge Avatar Base -->
+  <g transform="translate(105, 55)">
+    <!-- Body base -->
+    <path d="M 10 75 C 10 58 22 52 35 52 C 48 52 60 58 60 75 Z" fill="#e0e7ff"/>
+    <!-- Face Head -->
+    <circle cx="35" cy="32" r="22" fill="#fed7aa"/>
+    <!-- Hair -->
+    <path d="M 15 28 C 15 15 24 10 35 10 C 46 10 55 15 55 28 C 55 20 46 15 35 15 C 24 15 15 20 15 28 Z" fill="#334155"/>
+    
+    <!-- Modern Tech Headset -->
+    <path d="M 13 32 A 22 22 0 0 1 57 32" stroke="url(#headset-grad)" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+    <!-- Headset Ear Cushions -->
+    <rect x="9" y="24" width="7" height="16" rx="3.5" fill="#4f46e5"/>
+    <rect x="54" y="24" width="7" height="16" rx="3.5" fill="#4f46e5"/>
+    <!-- Mic Boom Arm -->
+    <path d="M 12 36 L 16 46 L 26 46" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="27" cy="46" r="2.5" fill="#10b981"/>
+  </g>
+
+  <!-- Floating 24/7 Glowing Pill Badge -->
+  <g transform="translate(155, 30)" filter="url(#supp-shadow)">
+    <rect width="78" height="26" rx="13" fill="#0f172a" stroke="#10b981" stroke-width="1.2"/>
+    <circle cx="12" cy="13" r="4" fill="#10b981"/>
+    <text x="21" y="17" fill="#ffffff" font-family="system-ui, sans-serif" font-size="10" font-weight="700">24/7 Active</text>
+  </g>
+
+  <!-- Left Assistance Chat Bubble -->
+  <g transform="translate(32, 60)" filter="url(#supp-shadow)">
+    <rect width="80" height="34" rx="10" fill="url(#bubble-grad)" stroke="#cbd5e1" stroke-width="1"/>
+    <!-- Speech tail -->
+    <polygon points="72,34 76,40 64,34" fill="#ffffff"/>
+    <text x="10" y="16" fill="#0f172a" font-family="system-ui, sans-serif" font-size="8" font-weight="700">Instant Help</text>
+    <text x="10" y="27" fill="#64748b" font-family="system-ui, sans-serif" font-size="7.5">Average reply 2m</text>
+  </g>
+
+  <!-- Bottom Fast Resolution Guarantee Badge -->
+  <g transform="translate(100, 142)">
+    <rect width="80" height="22" rx="11" fill="url(#support-shield-grad)"/>
+    <path d="M12 11 L15 14 L20 8" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="25" y="15" fill="#ffffff" font-family="system-ui, sans-serif" font-size="8" font-weight="700">100% Resolved</text>
+  </g>
+</svg>
