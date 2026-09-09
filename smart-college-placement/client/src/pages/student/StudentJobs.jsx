@@ -42,6 +42,7 @@ export const StudentJobs = () => {
   });
 
   const [studentProfile, setStudentProfile] = useState(null);
+  const [showingFallbackJobs, setShowingFallbackJobs] = useState(false);
   const [resumeData, setResumeData] = useState(null);
   const [appliedJobIds, setAppliedJobIds] = useState(new Set());
 
@@ -81,6 +82,7 @@ export const StudentJobs = () => {
 
       setJobs(eligibleJobs);
       setStudentProfile(profileRes.data.studentProfile);
+      setShowingFallbackJobs(Boolean(jobsRes.data.fallback));
       setCompanies(
         Object.values(companyRoleSummary).map((company) => ({
           ...company,
@@ -200,6 +202,9 @@ export const StudentJobs = () => {
             <div>
               <h2 className="text-xl font-bold text-gray-900">Partner Enterprise Vacancies</h2>
               <p className="text-xs text-gray-500">Eligible roles and openings based on your registered student profile.</p>
+              {showingFallbackJobs && (
+                <p className="text-xs text-amber-600 mt-1">Showing approved campus roles while no exact qualification match is available.</p>
+              )}
             </div>
             <span className="text-xs font-semibold text-primary">Click any company to inspect hiring statistics</span>
           </div>
@@ -447,6 +452,13 @@ export const StudentJobs = () => {
                             className="px-4 py-2 rounded-xl text-xs font-bold text-emerald-700 bg-emerald-100 flex items-center gap-1.5 cursor-default"
                           >
                             <CheckCircle2 size={15} /> Applied
+                          </button>
+                        ) : !eligible ? (
+                          <button
+                            disabled
+                            className="px-4 py-2 rounded-xl text-xs font-bold text-gray-500 bg-gray-100 flex items-center gap-1.5 cursor-not-allowed"
+                          >
+                            Not eligible
                           </button>
                         ) : (
                           <button

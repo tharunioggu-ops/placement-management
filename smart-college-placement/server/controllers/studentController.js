@@ -268,25 +268,44 @@ exports.getRecommendedJobs = asyncHandler(async (req, res) => {
 
   const { location, jobType, workMode } = req.query;
   const query = { status: 'Approved' };
+  const hasEligibilityData = Boolean(
+    studentProfile.department &&
+    studentProfile.cgpa !== undefined &&
+    studentProfile.cgpa !== null
+  );
 
-  if (studentProfile.department && studentProfile.cgpa !== undefined && studentProfile.cgpa !== null) {
+  if (hasEligibilityData) {
     query.eligibleDepartments = studentProfile.department;
     query.minimumCGPA = { $lte: studentProfile.cgpa };
     query.maximumBacklogs = { $gte: studentProfile.backlogs || 0 };
-  } else {
-    return res.status(200).json({ success: true, jobs: [] });
   }
 
   if (location) query.location = new RegExp(location, 'i');
   if (jobType) query.jobType = jobType;
   if (workMode) query.workMode = workMode;
 
-  const recommendedJobs = await Job.find(query)
+  let recommendedJobs = await Job.find(query)
     .populate('companyId')
     .populate('recruiterId');
 
+  if (recommendedJobs.length === 0) {
+    recommendedJobs = await Job.find({
+      status: 'Approved',
+      ...(location ? { location: new RegExp(location, 'i') } : {}),
+      ...(jobType ? { jobType } : {}),
+      ...(workMode ? { workMode } : {}),
+    })
+      .populate('companyId')
+      .populate('recruiterId');
+  }
+
   res.status(200).json({
     success: true,
+    fallback: !hasEligibilityData || recommendedJobs.some((job) =>
+      !job.eligibleDepartments?.includes(studentProfile.department) ||
+      job.minimumCGPA > studentProfile.cgpa ||
+      job.maximumBacklogs < (studentProfile.backlogs || 0)
+    ),
     jobs: recommendedJobs,
   });
 });
