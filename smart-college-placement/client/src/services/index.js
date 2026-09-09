@@ -32,7 +32,7 @@ export const studentService = {
   getProfile: () => api.get('/students/profile'),
   updateProfile: (data) => api.put('/students/profile', data),
   getApplications: () => api.get('/students/applications'),
-  getRecommendedJobs: () => api.get('/students/recommended-jobs'),
+  getRecommendedJobs: (filters) => api.get('/students/recommended-jobs', { params: filters }),
   uploadResume: (formData) =>
     api.post('/students/resume', formData, {
       headers: {

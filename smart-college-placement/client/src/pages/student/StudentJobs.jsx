@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  jobService, 
   studentService, 
   companyService 
 } from '../../services';
@@ -58,7 +57,7 @@ export const StudentJobs = () => {
   const fetchInitialData = async () => {
     try {
       const [jobsRes, profileRes, compRes, resumeRes, appsRes] = await Promise.all([
-        jobService.getAllJobs(filters),
+        studentService.getRecommendedJobs(filters),
         studentService.getProfile().catch(() => ({ data: { studentProfile: null } })),
         companyService.getVacancies().catch(() => ({ data: { companies: [] } })),
         studentService.getResume().catch(() => ({ data: { resume: null } })),
@@ -101,7 +100,7 @@ export const StudentJobs = () => {
     setAppliedJobIds((prev) => new Set([...prev, jobId]));
   };
 
-  // Filter jobs by search and company
+  // Filter the eligible jobs by search and company.
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch =
       job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -112,7 +111,12 @@ export const StudentJobs = () => {
       !selectedCompanyFilter ||
       job.companyId?.companyName?.toLowerCase() === selectedCompanyFilter.toLowerCase();
 
-    return matchesSearch && matchesCompany;
+    const matchesLocation = !filters.location ||
+      job.location?.toLowerCase().includes(filters.location.toLowerCase());
+    const matchesJobType = !filters.jobType || job.jobType === filters.jobType;
+    const matchesWorkMode = !filters.workMode || job.workMode === filters.workMode;
+
+    return matchesSearch && matchesCompany && matchesLocation && matchesJobType && matchesWorkMode;
   });
 
   if (loading) return <LoadingSpinner />;

@@ -266,13 +266,22 @@ exports.getRecommendedJobs = asyncHandler(async (req, res) => {
     return res.status(404).json({ success: false, message: 'Student profile not found' });
   }
 
-  // Find jobs matching student criteria
-  const recommendedJobs = await Job.find({
-    eligibleDepartments: studentProfile.department,
-    minimumCGPA: { $lte: studentProfile.cgpa },
-    maximumBacklogs: { $gte: studentProfile.backlogs },
-    status: 'Approved',
-  })
+  const { location, jobType, workMode } = req.query;
+  const query = { status: 'Approved' };
+
+  if (studentProfile.department && studentProfile.cgpa !== undefined && studentProfile.cgpa !== null) {
+    query.eligibleDepartments = studentProfile.department;
+    query.minimumCGPA = { $lte: studentProfile.cgpa };
+    query.maximumBacklogs = { $gte: studentProfile.backlogs || 0 };
+  } else {
+    return res.status(200).json({ success: true, jobs: [] });
+  }
+
+  if (location) query.location = new RegExp(location, 'i');
+  if (jobType) query.jobType = jobType;
+  if (workMode) query.workMode = workMode;
+
+  const recommendedJobs = await Job.find(query)
     .populate('companyId')
     .populate('recruiterId');
 
