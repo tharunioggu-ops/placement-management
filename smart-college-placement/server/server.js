@@ -11,8 +11,11 @@ const { uploadRootDir } = require('./middleware/uploadMiddleware');
 
 const app = express();
 
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
-  .split(',')
+const allowedOrigins = [
+  'https://placement-management-ivory-eight.vercel.app',
+  'http://localhost:5173',
+  ...(process.env.CLIENT_URL || '').split(','),
+]
   .map((origin) => origin.trim())
   .filter(Boolean);
 
