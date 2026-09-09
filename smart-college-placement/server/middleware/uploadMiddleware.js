@@ -1,12 +1,15 @@
 const multer = require('multer');
+const os = require('os');
 const path = require('path');
 const fs = require('fs');
 
+const uploadRootDir = process.env.UPLOAD_DIR
+  || (process.env.VERCEL ? path.join(os.tmpdir(), 'smart-college-placement', 'uploads') : path.join(__dirname, '../uploads'));
+fs.mkdirSync(uploadRootDir, { recursive: true });
+
 // --- Resume Upload Configuration ---
-const resumeUploadDir = path.join(__dirname, '../uploads/resumes');
-if (!fs.existsSync(resumeUploadDir)) {
-  fs.mkdirSync(resumeUploadDir, { recursive: true });
-}
+const resumeUploadDir = path.join(uploadRootDir, 'resumes');
+fs.mkdirSync(resumeUploadDir, { recursive: true });
 
 const resumeStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -45,10 +48,8 @@ const uploadResume = multer({
 });
 
 // --- Profile Image Upload Configuration ---
-const profileImageDir = path.join(__dirname, '../uploads/profiles');
-if (!fs.existsSync(profileImageDir)) {
-  fs.mkdirSync(profileImageDir, { recursive: true });
-}
+const profileImageDir = path.join(uploadRootDir, 'profiles');
+fs.mkdirSync(profileImageDir, { recursive: true });
 
 const profileImageStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -81,6 +82,7 @@ const uploadProfileImage = multer({
 module.exports = {
   uploadResume,
   uploadProfileImage,
+  uploadRootDir,
   uploadDir: resumeUploadDir,
   profileImageDir,
 };

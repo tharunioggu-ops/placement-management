@@ -7,6 +7,7 @@ const path = require('path');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorMiddleware');
 const { apiLimiter } = require('./middleware/rateLimiter');
+const { uploadRootDir } = require('./middleware/uploadMiddleware');
 
 const app = express();
 
@@ -52,7 +53,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Serve static uploads for resumes and assets
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(uploadRootDir));
 
 // Rate Limiting
 app.use('/api/', apiLimiter);
