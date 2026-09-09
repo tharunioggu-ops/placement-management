@@ -24,7 +24,10 @@ const isAllowedOrigin = (origin) => {
 };
 
 // Connect to the database. Records are created through the application workflow.
-connectDB();
+const databaseConnection = connectDB().catch((error) => {
+  console.error(`Database initialization failed: ${error.message}`);
+  return null;
+});
 
 // Middleware
 app.use(
@@ -54,6 +57,24 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Rate Limiting
 app.use('/api/', apiLimiter);
 
+app.use(async (req, res, next) => {
+  if (req.path === '/health') {
+    next();
+    return;
+  }
+
+  try {
+    const connection = await databaseConnection;
+    if (!connection) {
+      res.status(503).json({ success: false, message: 'Database unavailable' });
+      return;
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
@@ -82,10 +103,12 @@ app.use((req, res) => {
 // Error Handling Middleware
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
 module.exports = app;

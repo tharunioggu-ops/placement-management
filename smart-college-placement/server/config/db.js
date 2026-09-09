@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const connectDB = async () => {
+  if (!process.env.MONGO_URI) {
+    throw new Error('MONGO_URI is not configured');
+  }
+
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
@@ -19,7 +23,7 @@ const connectDB = async () => {
     return conn;
   } catch (error) {
     console.error(`Error connecting to MongoDB: ${error.message}`);
-    process.exit(1);
+    throw error;
   }
 };
 
